@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="../../../lib/dec/json/Identity.json"></script>
+<script type="text/javascript" src="../../../lib/dec/json/Settings.json"></script>
+<script type="text/javascript" src="../../../lib/dec/js/minified/Properties.min.js"></script>
+<script type="text/javascript" src="../../../lib/dec/js/minified/Promise.min.js"></script>
+<script type="text/javascript" src="../../../lib/dec/js/minified/DECSdk.min.js"></script>
+</head>
+
+<body>
+
+<button type="button" onclick="syncContacts()">SyncContacts</button>
+<script>
+var pHandle = null;
+
+function decCallback(value) {
+	console.log("Inside DEC Callback :::: ", value);
+	
+	if(value instanceof DecError) {
+		console.log("ErrorCode ::: " , value.getErrorCode());
+		console.log("ErrorMessage ::: " , value.getErrorMessage());
+	} else if(value instanceof DecSuccess) {
+		console.log("SuccessCode ::: " , value.getSuccessCode());
+		console.log("SuccessMessage ::: " , value.getSuccessMessage());
+
+		subscribe();
+		
+		console.log("Storage after subscribe ::: ", storage);
+		
+	}
+};
+
+function clearStorage() {
+	localStorage.clear();
+}
+
+function resolve(res) {
+   console.log("RESOLVE", res);
+}
+
+function reject(error) {
+   console.log(error);
+}
+
+function subscribe() {
+	pHandle = drive.identity.currentUser.subscribe(function callbackIndentity(value, eventType) {
+		console.log("INSIDE CALLBACK IDENTITY ", value);
+		console.log("EVENT TYPE IS :::  ", eventType);
+	});
+}
+
+function unSubscribe() {
+	drive.identity.currentUser.unsubscribe(pHandle);
+}
+
+function syncContacts() {
+	var settings = {"sync":true};
+	drive.settings.identity.currentUser.contacts.set(settings);
+}
+
+init("CalendarSync", decCallback, ["identity","settings"]);
+</script>
+
+
+</body>
+</html>

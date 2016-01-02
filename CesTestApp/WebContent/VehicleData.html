@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Vehicle Data App</title>
+		<script type="text/javascript" src="lib/dec/js/normal/Properties.js"></script>
+		<script type="text/javascript" src="lib/dec/js/minified/Promise.min.js"></script>
+		<script type="text/javascript" src="lib/dec/js/normal/DECSdk.js"></script>
+		<script type="text/javascript" src="lib/dec/json/Vehicleinfo.json"></script>
+		<script>
+		alert("Yo");
+		function decCallback(value) {
+			console.log("Inside DEC Callback :::: ", value);
+	
+			if (value instanceof DecError) {
+				console.log("ErrorCode ::: ", value.getErrorCode());
+				console.log("ErrorMessage ::: ", value.getErrorMessage());
+			} else if (value instanceof DecSuccess) {
+				console.log("SuccessCode ::: ", value.getSuccessCode());
+				console.log("SuccessMessage ::: ", value.getSuccessMessage());
+				alert("Subscribing...");
+				subscribe();
+			}
+		};		
+		init("vehicledata", decCallback, [ "vehicleinfo" ]);
+		var speedSubHandle = null;
+		
+		</script>
+</head>
+<body>
+
+	<div id="display">
+	</div>
+	
+	<script>
+	
+		
+		
+		function subscribe () {
+			speedSubHandle = drive.vehicleinfo.vehicleSpeed.subscribe(onSpeedChange);			
+		}
+		
+		function onSpeedChange(data) {
+			//alert(data.speed);
+			document.getElementById("display").innerHTML = "<span>" + data.speed + "</span>";
+		}
+	</script>
+
+</body>
+</html>

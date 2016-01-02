@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="../../../lib/dec/json/Calendar.json"></script>
+<script type="text/javascript" src="../../../lib/dec/json/Settings.json"></script>
+<script type="text/javascript" src="../../../lib/dec/js/minified/Properties.min.js"></script>
+<script type="text/javascript" src="../../../lib/dec/js/minified/Promise.min.js"></script>
+<script type="text/javascript" src="../../../lib/dec/js/minified/DECSdk.min.js"></script>
+</head>
+
+<body>
+
+<button type="button" onclick="syncCalendar()">SyncCalendar</button>
+<script>
+var pHandle = null;
+var cHandle = null;
+
+function decCallback(value) {
+	console.log("Inside DEC Callback :::: ", value);
+	
+	if(value instanceof DecError) {
+		console.log("ErrorCode ::: " , value.getErrorCode());
+		console.log("ErrorMessage ::: " , value.getErrorMessage());
+	} else if(value instanceof DecSuccess) {
+		console.log("SuccessCode ::: " , value.getSuccessCode());
+		console.log("SuccessMessage ::: " , value.getSuccessMessage());
+
+		subscribe();
+		
+		console.log("Storage after subscribe ::: ", storage);
+		
+	}
+};
+
+function clearStorage() {
+	localStorage.clear();
+}
+
+function resolve(res) {
+   console.log("RESOLVE", res);
+}
+
+function reject(error) {
+   console.log(error);
+}
+
+function subscribe() {
+	pHandle = drive.calendar.subscribe(function callbackSearch(value, eventType) {
+		console.log("INSIDE CALLBACK CALENDAR ", value);
+		console.log("EVENT TYPE IS :::  ", eventType);
+	});
+	
+	cHandle = drive.calendar.current.events.subscribe(function callbackSearch(value, eventType) {
+		console.log("INSIDE CALLBACK CALENDAR EVENTS ", value);
+		console.log("EVENT TYPE IS :::  ", eventType);
+	});
+
+}
+
+function unSubscribe() {
+	drive.calendar.current.events.unsubscribe(cHandle);
+	drive.calendar.unsubscribe(pHandle);
+}
+
+function syncCalendar() {
+	var settings = {"sync":true};
+	drive.settings.calendar.currentUser.set(settings);
+}
+
+//clearStorage();
+init("CalendarSync", decCallback, ["calendar","settings"]);
+</script>
+
+
+</body>
+</html>

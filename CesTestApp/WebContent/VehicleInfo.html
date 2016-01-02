@@ -1,0 +1,160 @@
+
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Vehicle Info App</title>
+		<script type="text/javascript" src="lib/dec/js/normal/Properties.js"></script>
+		<script type="text/javascript" src="lib/dec/js/minified/Promise.min.js"></script>
+		<script type="text/javascript" src="lib/dec/js/normal/DECSdk.js"></script>
+		<script type="text/javascript" src="lib/dec/json/Vehicleinfo.json"></script>
+		<!--  <script type="text/javascript" src="vehicleinfo.js"></script> -->
+		<script>
+		
+		var odoSubHandle = null;
+		
+		function decCallback(value) {
+			console.log("Inside DEC Callback :::: ", value);
+
+			if (value instanceof DecError) {
+				console.log("ErrorCode ::: ", value.getErrorCode());
+				console.log("ErrorMessage ::: ", value.getErrorMessage());
+			} else if (value instanceof DecSuccess) {
+				console.log("SuccessCode ::: ", value.getSuccessCode());
+				console.log("SuccessMessage ::: ", value.getSuccessMessage());
+				subscribeToVehicleInfo();
+				//setRequests();
+			}
+		};
+
+		function resolve(res) {
+			console.log("RESOLVE", res);
+		}
+
+		function reject(error) {
+			console.log(error);
+		}		
+		
+		function testCallback(results, eventType) {
+			//alert("... Subscription CallBack Rcvd ...");
+			// var jsonText = JSON.stringify(results);
+			// alert("jsonText = "+ jsonText);
+			// displayResults(jsonText);
+			logResultInHtml(results);
+			// unsubscribe();
+		}
+
+		function subscribeToVehicleInfo() {
+			alert("subscribing");
+			// subscribing to a particular attribute --- odometer
+			odoSubHandle = drive.vehicleinfo.odometer.subscribe(testCallback);
+			
+			drive.vehicleinfo.vehicleSpeed.subscribe(testCallback);
+			// subscribing to the whole vehicleinfo namespace
+			//sHandle = drive.vehicleinfo.tire.subscribe(testCallback);
+		}		
+		
+		init("vehicleinfo", decCallback, [ "vehicleinfo" ]);
+		
+		</script>
+		 		
+
+		<style>
+			.form{
+			    background:#f1f1f1; width:100%; margin-right: 0px; auto; padding-left:50px; padding-top:20px;
+			}
+		
+			.form input.buttom{ background: #4b8df9; display: inline-block; padding: 5px 10px 6px; color: #fbf7f7; text-decoration: none; font-weight: bold; line-height: 1; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; -moz-box-shadow: 0 1px 3px #999; -webkit-box-shadow: 0 1px 3px #999; box-shadow: 0 1px 3px #999; text-shadow: 0 -1px 1px #222; border: none; position: relative; cursor: pointer; font-size: 14px; font-family:Verdana, Geneva, sans-serif;}
+			
+			.form input.buttom:hover    { background-color: #2a78f6; }
+		
+		</style>
+  </head>
+  
+  <body>
+
+	<script>
+	 //var sHandle = null;
+
+	
+
+
+
+	function setRequests() {
+		alert("setting request");
+		var identificationSettings = {
+			"vin" : "TestVehicle17"
+		};
+		drive.vehicleinfo.identification.set(identificationSettings);
+	
+		
+	/* var odometer = {
+				"distanceTotal" : 33000
+			};
+		drive.vehicleinfo.odometer.set(odometer); */	
+		
+		var ms = 90;
+		var step = 9;
+		var speed = 0;
+		
+		while (speed <= ms) {
+			speed = speed + step;
+			var speedJ = {
+					"speed" : speed
+				};
+			alert(" Click ..."+speed);
+			drive.vehicleinfo.vehicleSpeed.set(speedJ);
+		}
+		
+
+		
+	}
+
+
+	function clearResults() {
+		document.getElementById('output').innerHTML = "";
+	}
+
+
+
+	function unSubscribe() {
+		//drive.vehicleinfo.unsubscribe(sHandle);
+	}
+
+	function logResultInHtml(attrVal) {
+		try {
+			if (attrVal instanceof Array) {
+				var arrayValJson = JSON.parse(JSON.stringify(attrVal));
+				var item = JSON.parse(arrayValJson[0]);
+				// var status = item["enabled"]; // for polices type
+				console.log("GET Array Value: " + item);
+			} else {
+				var value = JSON.stringify(attrVal);
+			}
+
+			var newElement = document.createElement('div');
+			newElement.innerHTML = "<br /> <span style='color:#0000FF;font-weight:bold;font-style:italic'>"
+					+ "Results" + "</span>";
+			document.getElementById('output').appendChild(newElement);
+
+			newElement = document.createElement('div');
+			newElement.innerHTML = value;
+			document.getElementById('output').appendChild(newElement);
+
+		} catch (e) {
+			// alert (" === NOT NICE === "+ e.description);
+		}
+
+	}	
+	
+	 
+
+	</script>    
+
+	<div class="form">
+		<input class="buttom" type="button" value="Clear Result" onclick="clearResults()" > 
+		<div id="output"></div>
+	</div> 
+	
+ </body> 
+
+</html>
